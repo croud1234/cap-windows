@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GifCreator;
 
 namespace WindowsFormsApplication2
 {
@@ -60,12 +61,14 @@ namespace WindowsFormsApplication2
             this.label3.Text = this.end_x + " : " + end_y;
 
             //　フォームを消して見る
+
             this.Hide();
 
-            System.Threading.Thread.Sleep(1000);
-
-            this.Show();
+            // 画像キャプチャー処理
+            List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
+            GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
         }
+
 
 
       
