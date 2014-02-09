@@ -12,6 +12,12 @@ namespace WindowsFormsApplication2
 {
     public partial class Form1 : Form
     {
+        int start_x;
+        int start_y;
+
+        int end_x;
+        int end_y;
+
         public Form1()
         {
             InitializeComponent();
@@ -32,6 +38,26 @@ namespace WindowsFormsApplication2
 
             this.label1.Text = x + " : " + y;
        
+        }
+
+        private void MouseDownTest(object sender, MouseEventArgs e)
+        {
+            System.Drawing.Point sp = System.Windows.Forms.Cursor.Position;
+            System.Drawing.Point cp = this.PointToClient(sp);
+            this.start_x = cp.X;
+            this.start_y = cp.Y;
+            
+            this.label2.Text = this.start_x + " : " + start_y;
+        }
+
+        private void MouseUpTest(object sender, MouseEventArgs e)
+        {
+            System.Drawing.Point sp = System.Windows.Forms.Cursor.Position;
+            System.Drawing.Point cp = this.PointToClient(sp);
+            this.end_x = cp.X;
+            this.end_y = cp.Y;
+
+            this.label3.Text = this.end_x + " : " + end_y;
         }
 
       
