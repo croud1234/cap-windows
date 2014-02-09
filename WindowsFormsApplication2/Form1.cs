@@ -98,14 +98,18 @@ namespace WindowsFormsApplication2
 
             Rectangle rc = Screen.PrimaryScreen.Bounds;
 
-            Bitmap bmp = new Bitmap(rc.Width, rc.Height,
+         //   Bitmap bmp = new Bitmap(rc.Width, rc.Height,
+         //     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            
+            rc.Location = new Point(this.start_x, this.start_y);
+            rc.Width = this.end_x - this.start_x;
+            rc.Height = this.end_y - this.start_y;
+
+            Bitmap bmp = new Bitmap( rc.Width, rc.Height,
               System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
 
-            System.Drawing.Size s = new Size(this.end_x - this.start_x, this.end_y - this.start_y);
-            //g.CopyFromScreen(new Point(this.start_x, this.start_y), new Point(this.end_x, this.end_y), s, CopyPixelOperation.SourceCopy);
-
-            g.CopyFromScreen(new Point(this.end_x, this.end_y), new Point(this.start_x, this.start_y), s, CopyPixelOperation.SourceCopy);
+            g.CopyFromScreen(rc.X, rc.Y, 0,0, bmp.Size);
             //解放
             //g.Dispose();
             string file = @"c:\tmp\screen.gif";
@@ -119,7 +123,8 @@ namespace WindowsFormsApplication2
             
             this.Close();
 
-            //this.label4.Text = this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y;
+            Console.WriteLine(this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y);
+            Console.WriteLine(bmp.Size);
         }
         
 
