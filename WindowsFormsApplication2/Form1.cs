@@ -102,24 +102,26 @@ namespace WindowsFormsApplication2
               System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
 
-            
-            g.CopyFromScreen(new Point(this.start_x, this.start_y), new Point(this.end_x, this.end_y), rc.Size, CopyPixelOperation.SourceCopy);
+            System.Drawing.Size s = new Size(this.end_x - this.start_x, this.end_y - this.start_y);
+            //g.CopyFromScreen(new Point(this.start_x, this.start_y), new Point(this.end_x, this.end_y), s, CopyPixelOperation.SourceCopy);
+
+            g.CopyFromScreen(new Point(this.end_x, this.end_y), new Point(this.start_x, this.start_y), s, CopyPixelOperation.SourceCopy);
             //解放
             //g.Dispose();
             string file = @"c:\tmp\screen.gif";
             bmp.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
 
 
-            Console.WriteLine(rc.Size);
+            //Console.WriteLine(rc.Size.GetType());
 
             //List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
             //GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
-
+            
             this.Close();
 
-            this.label4.Text = this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y;
+            //this.label4.Text = this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y;
         }
-
+        
 
 
       
