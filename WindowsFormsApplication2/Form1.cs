@@ -58,7 +58,15 @@ namespace WindowsFormsApplication2
             this.end_y = cp.Y;
 
             this.label3.Text = this.end_x + " : " + end_y;
+
+            //　フォームを消して見る
+            this.Hide();
+
+            System.Threading.Thread.Sleep(1000);
+
+            this.Show();
         }
+
 
       
     }
