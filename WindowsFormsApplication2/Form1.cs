@@ -28,6 +28,7 @@ namespace WindowsFormsApplication2
 
         private void MouseMoveTest(object sender, MouseEventArgs e)
         {
+            /*
             //フォーム上の座標でマウスポインタの位置を取得する
             //画面座標でマウスポインタの位置を取得する
             System.Drawing.Point sp = System.Windows.Forms.Cursor.Position;
@@ -39,7 +40,7 @@ namespace WindowsFormsApplication2
             int y = cp.Y;
 
             this.label1.Text = x + " : " + y;
-       
+            */
         }
 
         private void MouseDownTest(object sender, MouseEventArgs e)
@@ -67,18 +68,19 @@ namespace WindowsFormsApplication2
 
             // 画像キャプチャー処理
             // スクリーン・キャプチャする範囲を決定
-            Rectangle rc;
-           
+     
             // Bitmapオブジェクトにスクリーン・キャプチャ
 
-            int widht = this.end_y - start_y;
+            /**
+            
+             * int widht = this.end_y - start_y;
             int height = this.end_x - this.start_x;
             Bitmap bmp = new Bitmap(
                 widht, height, PixelFormat.Format32bppArgb);
 
             using (Graphics g = Graphics.FromImage(bmp))
             {
-                g.CopyFromScreen(new Point(start_x, start_y), new Point(end_x, end_y),  bmp.Size);
+                g.CopyFromScreen(new Point(this.start_x, this.start_y), new Point(this.end_x, this.end_y),  bmp.Size);
 
                 // ビット・ブロック転送方式の切り替え例：
                 //g.FillRectangle(Brushes.LightPink,
@@ -92,11 +94,28 @@ namespace WindowsFormsApplication2
             string filePath = @"C:\tmp\screen.gif";
             bmp.Save(filePath, ImageFormat.Gif);
             //Process.Start(filePath);
+             */
+
+            Rectangle rc = Screen.PrimaryScreen.Bounds;
+
+            Bitmap bmp = new Bitmap(rc.Width, rc.Height,
+              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Graphics g = Graphics.FromImage(bmp);
+
+            
+            g.CopyFromScreen(new Point(this.start_x, this.start_y), new Point(this.end_x, this.end_y), rc.Size, CopyPixelOperation.SourceCopy);
+            //解放
+            //g.Dispose();
+            string file = @"c:\tmp\screen.gif";
+            bmp.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
+
+
+            Console.WriteLine(rc.Size);
 
             //List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
             //GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
 
-            this.Show();
+            this.Close();
 
             this.label4.Text = this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y;
         }
