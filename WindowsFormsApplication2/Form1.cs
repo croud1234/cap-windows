@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GifCreator;
+using System.Drawing.Imaging;
 
 namespace WindowsFormsApplication2
 {
@@ -65,8 +66,39 @@ namespace WindowsFormsApplication2
             this.Hide();
 
             // 画像キャプチャー処理
-            List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
-            GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
+            // スクリーン・キャプチャする範囲を決定
+            Rectangle rc;
+           
+            // Bitmapオブジェクトにスクリーン・キャプチャ
+
+            int widht = this.end_y - start_y;
+            int height = this.end_x - this.start_x;
+            Bitmap bmp = new Bitmap(
+                widht, height, PixelFormat.Format32bppArgb);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.CopyFromScreen(new Point(start_x, start_y), new Point(end_x, end_y),  bmp.Size);
+
+                // ビット・ブロック転送方式の切り替え例：
+                //g.FillRectangle(Brushes.LightPink,
+                //  0, 0, rc.Width, rc.Height);
+                //g.CopyFromScreen(rc.X, rc.Y, 0, 0,
+                //  rc.Size, CopyPixelOperation.SourceAnd);
+                //g.Dispose();
+            }
+
+            // ビットマップ画像として保存して表示
+            string filePath = @"C:\tmp\screen.gif";
+            bmp.Save(filePath, ImageFormat.Gif);
+            //Process.Start(filePath);
+
+            //List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
+            //GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
+
+            this.Show();
+
+            this.label4.Text = this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y;
         }
 
 
