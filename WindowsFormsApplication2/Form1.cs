@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GifCreator;
 using System.Drawing.Imaging;
+using System.Threading;
+using System.IO;
 
 namespace WindowsFormsApplication2
 {
@@ -23,6 +25,7 @@ namespace WindowsFormsApplication2
         public Form1()
         {
             InitializeComponent();
+            this.WindowState = FormWindowState.Maximized;
             Console.WriteLine(@"Form1 start");
         }
 
@@ -96,35 +99,35 @@ namespace WindowsFormsApplication2
             //Process.Start(filePath);
              */
 
-            Rectangle rc = Screen.PrimaryScreen.Bounds;
+            for (int i = 0; i < 10; i++)
+            {
+                Rectangle rc = Screen.PrimaryScreen.Bounds;
+                rc.Location = new Point(this.start_x, this.start_y);
+                rc.Width = this.end_x - this.start_x;
+                rc.Height = this.end_y - this.start_y;
 
-         //   Bitmap bmp = new Bitmap(rc.Width, rc.Height,
-         //     System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            
-            rc.Location = new Point(this.start_x, this.start_y);
-            rc.Width = this.end_x - this.start_x;
-            rc.Height = this.end_y - this.start_y;
+                Bitmap bmp = new Bitmap(rc.Width, rc.Height,
+                  System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                Graphics g = Graphics.FromImage(bmp);
 
-            Bitmap bmp = new Bitmap( rc.Width, rc.Height,
-              System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Graphics g = Graphics.FromImage(bmp);
-
-            g.CopyFromScreen(rc.X, rc.Y, 0,0, bmp.Size);
-            //解放
-            //g.Dispose();
-            string file = @"c:\tmp\screen.gif";
-            bmp.Save(file, System.Drawing.Imaging.ImageFormat.Gif);
-
-
-            //Console.WriteLine(rc.Size.GetType());
+                g.CopyFromScreen(rc.X, rc.Y, 0, 0, bmp.Size,CopyPixelOperation.SourceCopy);
+                //解放
+                //g.Dispose();
+             
+                bmp.Save(@"c:\tmp\test" + i + ".gif", System.Drawing.Imaging.ImageFormat.Gif);
+                Thread.Sleep(1000);
+            }
 
             //List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
             //GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
-            
+
+            List<string> files = new List<string>( Directory.GetFiles( @"c:\tmp\") );
+            Console.WriteLine(files);
+            GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
+           
             this.Close();
 
-            Console.WriteLine(this.start_x + ":" + this.start_y + "\n" + this.end_x + ":" + this.end_y);
-            Console.WriteLine(bmp.Size);
+         
         }
         
 
