@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GifCreator;
-using System.Drawing.Imaging;
 using System.Threading;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Diagnostics;
+
 
 namespace WindowsFormsApplication2
 {
@@ -26,30 +24,13 @@ namespace WindowsFormsApplication2
         {
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
-            Console.WriteLine(@"Form1 start");
         }
 
-        private void MouseMoveTest(object sender, MouseEventArgs e)
-        {
-            /*
-            //フォーム上の座標でマウスポインタの位置を取得する
-            //画面座標でマウスポインタの位置を取得する
-            System.Drawing.Point sp = System.Windows.Forms.Cursor.Position;
-            //画面座標をクライアント座標に変換する
-            System.Drawing.Point cp = this.PointToClient(sp);
-            //X座標を取得する
-            int x = cp.X;
-            //Y座標を取得する
-            int y = cp.Y;
-
-            this.label1.Text = x + " : " + y;
-            */
-        }
-
+        
         private void MouseDownTest(object sender, MouseEventArgs e)
         {
-            System.Drawing.Point sp = System.Windows.Forms.Cursor.Position;
-            System.Drawing.Point cp = this.PointToClient(sp);
+            Point sp = Cursor.Position;
+            Point cp = this.PointToClient(sp);
             this.start_x = cp.X;
             this.start_y = cp.Y;
             
@@ -58,7 +39,8 @@ namespace WindowsFormsApplication2
 
         private void MouseUpTest(object sender, MouseEventArgs e)
         {
-            System.Drawing.Point sp = System.Windows.Forms.Cursor.Position;
+            
+            System.Drawing.Point sp = Cursor.Position;
             System.Drawing.Point cp = this.PointToClient(sp);
             this.end_x = cp.X;
             this.end_y = cp.Y;
@@ -74,64 +56,30 @@ namespace WindowsFormsApplication2
      
             // Bitmapオブジェクトにスクリーン・キャプチャ
 
-            /**
-            
-             * int widht = this.end_y - start_y;
-            int height = this.end_x - this.start_x;
-            Bitmap bmp = new Bitmap(
-                widht, height, PixelFormat.Format32bppArgb);
+            Rectangle rc = Screen.PrimaryScreen.Bounds;
 
-            using (Graphics g = Graphics.FromImage(bmp))
-            {
-                g.CopyFromScreen(new Point(this.start_x, this.start_y), new Point(this.end_x, this.end_y),  bmp.Size);
+            rc.Location = new Point(this.start_x, this.start_y);
+            rc.Width = this.end_x - this.start_x;
+            rc.Height = this.end_y - this.start_y;
 
-                // ビット・ブロック転送方式の切り替え例：
-                //g.FillRectangle(Brushes.LightPink,
-                //  0, 0, rc.Width, rc.Height);
-                //g.CopyFromScreen(rc.X, rc.Y, 0, 0,
-                //  rc.Size, CopyPixelOperation.SourceAnd);
-                //g.Dispose();
-            }
-
-            // ビットマップ画像として保存して表示
-            string filePath = @"C:\tmp\screen.gif";
-            bmp.Save(filePath, ImageFormat.Gif);
-            //Process.Start(filePath);
-             */
+            Bitmap bmp = new Bitmap(rc.Width, rc.Height,PixelFormat.Format32bppArgb);
 
             for (int i = 0; i < 10; i++)
             {
-                Rectangle rc = Screen.PrimaryScreen.Bounds;
-                rc.Location = new Point(this.start_x, this.start_y);
-                rc.Width = this.end_x - this.start_x;
-                rc.Height = this.end_y - this.start_y;
 
-                Bitmap bmp = new Bitmap(rc.Width, rc.Height,
-                  System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                Graphics g = Graphics.FromImage(bmp);
-
-                g.CopyFromScreen(rc.X, rc.Y, 0, 0, bmp.Size,CopyPixelOperation.SourceCopy);
-                //解放
-                //g.Dispose();
-             
-                bmp.Save(@"c:\tmp\test" + i + ".gif", System.Drawing.Imaging.ImageFormat.Gif);
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.CopyFromScreen(rc.X, rc.Y, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
+                }
+                string filePath = @"C:\tmp\test"+ i +".gif";
+                bmp.Save(filePath, ImageFormat.Gif);
                 Thread.Sleep(1000);
             }
 
-            //List<string> files = new List<string>(new string[] { @"c:\tmp\1.gif", @"c:\tmp\2.gif" });
-            //GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
-
-            List<string> files = new List<string>( Directory.GetFiles( @"c:\tmp\") );
-            Console.WriteLine(files);
-            GifCreator.GifCreator.CreateAnimatedGif(files, 5, @"c:\tmp\out.gif");
+            List<string> files = new List<string>( Directory.GetFiles( @"c:\tmp\", "test*.gif") );
+            GifCreator.GifCreator.CreateAnimatedGif(files, 70, @"c:\tmp\out.gif");
            
             this.Close();
-
-         
         }
-        
-
-
-      
     }
 }

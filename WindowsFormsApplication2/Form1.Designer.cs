@@ -83,7 +83,6 @@
             this.Opacity = 0.8D;
             this.Text = "Form1";
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDownTest);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MouseMoveTest);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpTest);
             this.ResumeLayout(false);
             this.PerformLayout();
