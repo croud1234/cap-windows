@@ -47,6 +47,9 @@ namespace WindowsFormsApplication2
 
             this.label3.Text = this.end_x + " : " + end_y;
 
+            // 枠を選択して、今からスタートするというショートカットキー、終了させるためのショートカットキーがいる
+            // これで任意の時刻でキャプチャーがとれるようになる
+
             //　フォームを消して見る
 
             this.Hide();
