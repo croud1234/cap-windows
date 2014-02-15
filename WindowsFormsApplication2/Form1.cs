@@ -8,11 +8,14 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 
 
 
 namespace WindowsFormsApplication2
 {
+    delegate void Sample(object x, object y);
+
     public partial class Form1 : Form
     {
         int start_x;
@@ -62,9 +65,38 @@ namespace WindowsFormsApplication2
 
             this.Close();
            */
-            this.Close();
-        }
+            //this.Close();//フォームの境界線をなくす
+           
+            //大きさを適当に変更
+            //this.Location = new Point(this.start_x, this.start_y);
+            //this.Size = new Size(this.end_x - this.start_x, this.end_y - this.start_y);
+
+           // this.Bounds = new Rectangle(this.start_x, this.start_y, this.end_x, this.end_y);
+            //透明を指定する
+            //this.TransparencyKey = Color.Red;
+            //フォームの背景色を透明色にする
+           // this.BackColor = Color.Red;
+           
+
+            //path.AddRectangle(new Rectangle(0, 0, 100, 100));
+         
+            
+            // Draw the path to the screen.
    
+           
+            //e.Graphics.FillRegion(brush, region);
+            Graphics g = this.CreateGraphics();
+            GraphicsPath myPath = new GraphicsPath();
+            myPath.AddRectangle( new Rectangle( this.start_x, this.start_y, this.end_x - this.start_x, this.end_y - this.start_y) );
+            // Draw the path to the screen.
+            
+            Pen myPen = new Pen(Color.Black, 1);
+            myPen.DashStyle = DashStyle.DashDotDot;
+            //this.TransparencyKey = this.BackColor;
+            g.DrawPath(myPen, myPath);
+
+            
+        }
         private void ScreenShot()
         {
             // 画像キャプチャー処理
@@ -127,12 +159,14 @@ namespace WindowsFormsApplication2
                         break;
 
                     case Keys.S:
-                        this.Show();
+                       // this.Show();
                         this.Close();
                         break;
                 }
             }
         }
+
+    
     }
     
  

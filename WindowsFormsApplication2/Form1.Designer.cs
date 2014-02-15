@@ -87,6 +87,7 @@
             this.Name = "Form1";
             this.Opacity = 0.8D;
             this.Text = "Form1";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownTest);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDownTest);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpTest);
             this.ResumeLayout(false);
