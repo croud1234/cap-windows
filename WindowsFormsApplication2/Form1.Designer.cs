@@ -74,7 +74,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1419, 931);
+            this.ClientSize = new System.Drawing.Size(1419, 865);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -82,7 +82,7 @@
             this.Name = "Form1";
             this.Opacity = 0.8D;
             this.Text = "Form1";
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressTest);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownTest);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MouseDownTest);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MouseUpTest);
             this.ResumeLayout(false);

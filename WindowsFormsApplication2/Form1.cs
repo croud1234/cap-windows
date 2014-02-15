@@ -57,11 +57,18 @@ namespace WindowsFormsApplication2
 
             //　フォームを消して見る
 
-            this.Hide();
+          /*  this.Hide();
 
+
+            this.Close();
+           */
+        }
+   
+        private void ScreenShot()
+        {
             // 画像キャプチャー処理
             // スクリーン・キャプチャする範囲を決定
-     
+
             // Bitmapオブジェクトにスクリーン・キャプチャ
 
             Rectangle rc = Screen.PrimaryScreen.Bounds;
@@ -70,68 +77,62 @@ namespace WindowsFormsApplication2
             rc.Width = this.end_x - this.start_x;
             rc.Height = this.end_y - this.start_y;
 
-            this.label4.Text = rc.Location.X + ": " + rc.Location.Y +"\n"+rc.Width + " : " + rc.Height;
+            this.label4.Text = rc.Location.X + ": " + rc.Location.Y + "\n" + rc.Width + " : " + rc.Height;
 
-            Bitmap bmp = new Bitmap(rc.Width, rc.Height,PixelFormat.Format32bppArgb);
+            Bitmap bmp = new Bitmap(rc.Width, rc.Height, PixelFormat.Format32bppArgb);
 
-            
+
             for (int i = 0; i < 5; i++)
             {
                 //マウスポイントを取得
                 this.Cursor = new Cursor(Cursor.Current.Handle);
                 Point curPoint = Cursor.Position;
 
-                this.label4.Text = curPoint.X +":"+curPoint.Y;
+                this.label4.Text = curPoint.X + ":" + curPoint.Y;
                 using (Graphics g = Graphics.FromImage(bmp))
                 {
                     g.CopyFromScreen(this.start_x, this.start_y, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
                     //マウスカーソルを書き込む
                     this.Cursor.Draw(g, new Rectangle(curPoint, this.Cursor.Size));
                 }
-               
 
-                string filePath = @"C:\tmp\test"+ i +".gif";
+
+                string filePath = @"C:\tmp\test" + i + ".gif";
 
                 bmp.Save(filePath, ImageFormat.Gif);
                 Thread.Sleep(500);
-               
-            
             }
 
-            List<string> files = new List<string>( Directory.GetFiles( @"c:\tmp\", "test*.gif") );
+            List<string> files = new List<string>(Directory.GetFiles(@"c:\tmp\", "test*.gif"));
             GifCreator.GifCreator.CreateAnimatedGif(files, 70, @"c:\tmp\out.gif");
-           
-            this.Close();
-            //this.Show();
-            
         }
 
-        private void KeyPressTest(object sender, KeyPressEventArgs e)
+        private void keyDownTest(object sender, KeyEventArgs e)
         {
-            if (Char.IsControl(e.KeyChar) && e.KeyChar != ((char)Keys.A | (char)Keys.ControlKey))
 
+
+            this.label4.Text = ":" + e.KeyCode;
+
+            if (e.Control)
             {
-                MessageBox.Show("Pressed " + Keys.Control);
+                switch (e.KeyCode)
+                {
+                    case Keys.A:
+                        //this.Select();
+                        //this.Hide();
+                        //this.ScreenShot();
+                        //MessageBox.Show("おわり");
+                        //this.Close();
+                        break;
+
+                    case Keys.S:
+                        this.Show();
+                        this.Close();
+                        break;
+                }
             }
-            
-            /*
-            Debug.WriteLine(e.KeyChar == (char)Keys.A);
-            Debug.WriteLine(e.KeyChar == Keys.Control);
-
-            if ((Control.ModifierKeys & Keys.Control) == Keys.Control && e.KeyChar == (char)Keys.A)
-            {
-                Console.WriteLine("Ctrlキーとaが押されています。");
-            }
-
-           if(Control.ModifierKeys == Keys.Shift){
-               Debug.WriteLine("おしたよ");
-           }
-             */
-
-            /*
-            if (e.KeyCode == Keys.F1)
-                Console.WriteLine("F1キーが押されました。");
-             */
         }
     }
+    
+ 
 }
