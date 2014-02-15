@@ -62,6 +62,7 @@ namespace WindowsFormsApplication2
 
             this.Close();
            */
+            this.Close();
         }
    
         private void ScreenShot()
