@@ -46,19 +46,11 @@ namespace WindowsFormsApplication2
             //this.TransparencyKey = this.BackColor;
           // this.BackColor = Color.FromArgb(100, 255, 255, 255); // 半透明
             this.DoubleBuffered = true;
-            this.Paint += new PaintEventHandler(Form1_Paint);
             this.timer1 = new System.Windows.Forms.Timer();
             this.timer1.Enabled = true;
             this.timer1.Interval = 200;
            // this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
         }
-
-        private void Form1_Paint(object sender, PaintEventArgs e)
-        {
-            // 親コントロールを描画
-            this.DrawParentControl(this.Parent, e);
-        }
-
         
         private void MouseDownTest(object sender, MouseEventArgs e)
         {
@@ -245,63 +237,127 @@ namespace WindowsFormsApplication2
                 }
             }
         }
-        /*
-        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
-        {  
-            // 親コントロールを描画
-            //this.DrawParentControl(this, pevent);
-        }
-         * */
-        static int i = 0;
-        private void DrawParentControl(Control c, PaintEventArgs pevent)
+
+
+        private void DrawBackControl(Control c, System.Windows.Forms.PaintEventArgs pevent)
         {
-         
-            Debug.WriteLine(i++);
-            Rectangle rc = Screen.PrimaryScreen.Bounds;
-            using (this.bmp = new Bitmap(rc.Width, rc.Height))
+            using (Bitmap bmp = new Bitmap(c.Width, c.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
             {
-                Debug.WriteLine("a:" + i);
-                using (Graphics g = Graphics.FromImage(this.bmp))
+                c.DrawToBitmap(bmp, new Rectangle(0, 0, c.Width, c.Height));
+
+                int offsetX = (c.Left - this.Left) - (int)Math.Floor((double)(this.Bounds.Width - this.ClientRectangle.Width) / 2.0);
+                int offsetY = (c.Top - this.Top) - (int)Math.Floor((double)(this.Bounds.Height - this.ClientRectangle.Height) / 2.0);
+                pevent.Graphics.DrawImage(bmp, offsetX, offsetY, c.Width, c.Height);
+            }
+        }
+        private bool isPaintInvoking;
+
+        private void DrawOpacity(System.Windows.Forms.PaintEventArgs pevent)
+        {
+            Debug.WriteLine("ここにきていた");
+            this.isPaintInvoking = true;
+
+            using (Bitmap bmp = new Bitmap(this.ClientRectangle.Width, this.ClientRectangle.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+            {
+                using (Graphics g = Graphics.FromImage(bmp))
                 {
-                    Debug.WriteLine("b:" + i);
-                    //Debug.WriteLine(this.ClientRectangle);
-                    using (PaintEventArgs p = new PaintEventArgs(g, rc))
+                    g.Clip = new Region(this.ClientRectangle);
+                    using (PaintEventArgs p = new PaintEventArgs(g, this.ClientRectangle))
                     {
-                        Debug.WriteLine("c:" + i);
-                        this.InvokePaintBackground(this, p);
-                        Debug.WriteLine("c1:" + i);
-                        this.InvokePaint(this, p);
-                        Debug.WriteLine("c2:" + i);
+                        this.OnPaintBackground(p);
+                        this.OnPaint(p);
                     }
-                    Debug.WriteLine("d:" + i);
                 }
 
+                System.Drawing.Imaging.ColorMatrix cm = new System.Drawing.Imaging.ColorMatrix();
+                cm.Matrix00 = 1;
+                cm.Matrix11 = 1;
+                cm.Matrix22 = 1;
+                cm.Matrix33 = Convert.ToSingle(this.Opacity); // 0 が透明、1 が不透明
+                cm.Matrix44 = 1;
+                System.Drawing.Imaging.ImageAttributes ia = new System.Drawing.Imaging.ImageAttributes();
+                ia.SetColorMatrix(cm);
 
-                Debug.WriteLine("e:" + i);
-                //int offsetX = this.Left + (int)Math.Floor((double)(this.Bounds.Width - this.ClientRectangle.Width) / 2.0);
-                //int offsetY = this.Top + (int)Math.Floor((double)(this.Bounds.Height - this.ClientRectangle.Height) / 2.0);
-                //Debug.WriteLine(offsetX + ":" + offsetY);
-
-                pevent.Graphics.DrawImage(
-                    this.bmp,
-                    this.ClientRectangle,
-                    new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height),
-                    GraphicsUnit.Pixel
-                );
+                pevent.Graphics.DrawImage(bmp, new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height), 0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height, GraphicsUnit.Pixel, ia);
             }
-            //string filePath = @"C:\tmp\test" + i + ".gif";
-            //this.bmp.Save(filePath, ImageFormat.Gif);
-
-           
+            Debug.WriteLine("あいうえお");
+               
+            this.isPaintInvoking = false;
         }
-        /*
-        protected override void OnPaintBackground(PaintEventArgs pevent)
+        private void DrawParentControl(Control c, PaintEventArgs pevent)
         {
-            // 何もしない
-            // base.OnPaintBackground(pevent);
-        }
-         */
+           
+            using (Bitmap bmp = new Bitmap(this.Width, this.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+            {
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    using (PaintEventArgs p = new PaintEventArgs(g, new Rectangle(0,0, this.Width, this.Height) ))
+                    {
+                        this.InvokePaintBackground(this, p);
+                        this.InvokePaint(this, p);
+                    }
+                }
 
+                int offsetX = this.Left + (int)(Math.Ceiling((double)(this.Bounds.Width - this.ClientRectangle.Width) / 2));
+                int offsetY = this.Top + (int)(Math.Ceiling((double)(this.Bounds.Height - this.ClientRectangle.Height) / 2));
+                pevent.Graphics.DrawImage(bmp, this.ClientRectangle, new Rectangle(offsetX, offsetY, this.ClientRectangle.Width, this.ClientRectangle.Height), GraphicsUnit.Pixel);
+            }
+        }
+
+        private void DrawParentWithBackControl(System.Windows.Forms.PaintEventArgs pevent)
+        {
+            // 親コントロールを描画
+            this.DrawParentControl(this, pevent);
+
+            // 親コントロールとの間のコントロールを親側から描画
+            for (int i = this.Controls.Count - 1; i >= 0; i--)
+            {
+                Control c = this.Controls[i];
+                if (object.ReferenceEquals(c, this))
+                {
+                    break;
+                }
+                if (this.Bounds.IntersectsWith(c.Bounds) == false)
+                {
+                    continue;
+                }
+
+                this.DrawBackControl(c, pevent);
+            }
+        }
+
+        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
+        {
+            Debug.WriteLine("かいし？");
+            if (this.isPaintInvoking == true)
+            {
+                // 3. コントロールの背景を透明に描画 (DrawOpacity 内の OnPaintBackground メソッドでのみ処理をする)
+                base.OnPaintBackground(pevent);
+                return;
+            }
+
+            // 1. 背景を透過
+            this.DrawParentWithBackControl(pevent);
+            for (int i = this.Controls.Count - 1; i >= 0; i--)
+            {
+                Control c = this.Controls[i];
+                if (object.ReferenceEquals(c, this))
+                {
+                    break;
+                }
+                if (this.Bounds.IntersectsWith(c.Bounds) == false)
+                {
+                    continue;
+                }
+
+                this.DrawBackControl(c, pevent);
+            }
+
+            // 2. コントロールを透明に描画
+            this.DrawOpacity(pevent);
+        }
+
+        
         private void timer1_Tick(object sender, EventArgs e)
         {
             this.TopMost = true;
