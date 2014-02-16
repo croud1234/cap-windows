@@ -9,12 +9,12 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
-
+using System.Runtime.InteropServices;
 
 
 namespace WindowsFormsApplication2
 {
-    delegate void Sample(object x, object y);
+    
 
     public partial class Form1 : Form
     {
@@ -23,12 +23,40 @@ namespace WindowsFormsApplication2
 
         int end_x;
         int end_y;
+        Bitmap bmp;
 
         public Form1()
         {
+            this.TopMost = true;
+            this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+          
             InitializeComponent();
-            this.WindowState = FormWindowState.Maximized;
-            this.FormBorderStyle = FormBorderStyle.None;
+      
+            Debug.WriteLine(this.AllowTransparency + "透明");
+            Debug.WriteLine(this.TransparencyKey+"透明");
+            Debug.WriteLine(this.BackColor + "透明");
+            //this.BackColor = Color.Transparent; // 透明にはならない。白っぽい画面
+           //this.TransparencyKey = this.BackColor; // これで全体が透明になる。
+       
+            //this.WindowState = FormWindowState.Maximized;
+            //this.FormBorderStyle = FormBorderStyle.None;
+           // this.BackColor = Color.Black;
+          //  this.BackColor = Color.Transparent;
+            //this.BackColor = this.TransparencyKey; // 透明
+            //this.TransparencyKey = this.BackColor;
+          // this.BackColor = Color.FromArgb(100, 255, 255, 255); // 半透明
+            this.DoubleBuffered = true;
+            this.Paint += new PaintEventHandler(Form1_Paint);
+            this.timer1 = new System.Windows.Forms.Timer();
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 200;
+           // this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+        }
+
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            // 親コントロールを描画
+            this.DrawParentControl(this.Parent, e);
         }
 
         
@@ -51,9 +79,21 @@ namespace WindowsFormsApplication2
             this.end_y = cp.Y;
 
             this.label3.Text = this.end_x + " : " + end_y;
+           // this.Paint += new PaintEventHandler(Form1_Paint);
+           // this.Invalidate();
 
-               
-            
+            //this.Opacity = 0.0;
+            /*
+            Form1 form2 = new Form1();
+            this.AddOwnedForm(form2);  // 親 Form が form2 を所有する
+            //form2.BackColor = Color.DarkGreen;
+            form2.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            form2.BackColor = Color.Transparent;
+            form2.TransparencyKey = this.BackColor;
+            form2.Opacity = 0.0;
+            form2.Show();
+            */
+
             // 枠を選択して、今からスタートするというショートカットキー、終了させるためのショートカットキーがいる
             // これで任意の時刻でキャプチャーがとれるようになる
             // 画面全体にもしたい
@@ -75,7 +115,7 @@ namespace WindowsFormsApplication2
             //透明を指定する
             //this.TransparencyKey = Color.Red;
             //フォームの背景色を透明色にする
-           // this.BackColor = Color.Red;
+           
            
 
             //path.AddRectangle(new Rectangle(0, 0, 100, 100));
@@ -83,7 +123,7 @@ namespace WindowsFormsApplication2
             
             // Draw the path to the screen.
    
-           
+           /*
             //e.Graphics.FillRegion(brush, region);
             Graphics g = this.CreateGraphics();
             GraphicsPath myPath = new GraphicsPath();
@@ -94,8 +134,46 @@ namespace WindowsFormsApplication2
             myPen.DashStyle = DashStyle.DashDotDot;
             //this.TransparencyKey = this.BackColor;
             g.DrawPath(myPen, myPath);
+            */
+          //  this.label4.Text = this.BackColor;
+            //SolidBrush myBrush = new SolidBrush(this.TransparencyKey);
 
             
+
+          //  this.TransparencyKey = Color.Red;
+            //フォームの背景色を透明色にする
+         //   this.BackColor = Color.Red;
+
+            /*
+            Graphics g = this.CreateGraphics();
+           
+            //g.FillRectangle(myBrush, new Rectangle(0, 0, 200, 300));;
+            Rectangle r =  new Rectangle(0, 0, 600, 700);
+            
+            //this.BackColor = Color.Transparent; // 透明
+
+            SolidBrush s = new SolidBrush(Color.Transparent);
+            
+            //SolidBrush s = new SolidBrush(Color.Red);
+
+            
+         
+            g.FillRectangle(s,r);
+            //this.Region = new Region(r);
+            
+            
+            
+         //   myBrush.Dispose();
+            g.Dispose();
+          //   this.TransparencyKey = this.BackColor; // これで全体が透明になる。
+       
+            */
+           // Region r = new Region(this.ClientRectangle);
+        //    this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            //this.BackColor =this.TransparencyKey; // 透明
+     //       this.TransparencyKey = this.BackColor;
+            //this.BackColor = Color.FromArgb(100, 255, 255, 255); // 半透明
+          //  this.Invalidate();  // 再描画を促す
         }
         private void ScreenShot()
         {
@@ -114,8 +192,8 @@ namespace WindowsFormsApplication2
 
             Bitmap bmp = new Bitmap(rc.Width, rc.Height, PixelFormat.Format32bppArgb);
 
-
-            for (int i = 0; i < 5; i++)
+            int i = 0;
+            for (; ; )
             {
                 //マウスポイントを取得
                 this.Cursor = new Cursor(Cursor.Current.Handle);
@@ -129,11 +207,9 @@ namespace WindowsFormsApplication2
                     this.Cursor.Draw(g, new Rectangle(curPoint, this.Cursor.Size));
                 }
 
-
-                string filePath = @"C:\tmp\test" + i + ".gif";
-
-                bmp.Save(filePath, ImageFormat.Gif);
+                bmp.Save(@"C:\tmp\test" + i + ".gif", ImageFormat.Gif);
                 Thread.Sleep(500);
+                i++;
             }
 
             List<string> files = new List<string>(Directory.GetFiles(@"c:\tmp\", "test*.gif"));
@@ -155,18 +231,82 @@ namespace WindowsFormsApplication2
                         //this.Hide();
                         //this.ScreenShot();
                         //MessageBox.Show("おわり");
-                        //this.Close();
+                        this.Close();
                         break;
 
                     case Keys.S:
                        // this.Show();
                         this.Close();
                         break;
+                    case Keys.B:
+                        MessageBox.Show("cntr * b 押した");
+                        break;
+                        
                 }
             }
         }
+        /*
+        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
+        {  
+            // 親コントロールを描画
+            //this.DrawParentControl(this, pevent);
+        }
+         * */
+        static int i = 0;
+        private void DrawParentControl(Control c, PaintEventArgs pevent)
+        {
+         
+            Debug.WriteLine(i++);
+            Rectangle rc = Screen.PrimaryScreen.Bounds;
+            using (this.bmp = new Bitmap(rc.Width, rc.Height))
+            {
+                Debug.WriteLine("a:" + i);
+                using (Graphics g = Graphics.FromImage(this.bmp))
+                {
+                    Debug.WriteLine("b:" + i);
+                    //Debug.WriteLine(this.ClientRectangle);
+                    using (PaintEventArgs p = new PaintEventArgs(g, rc))
+                    {
+                        Debug.WriteLine("c:" + i);
+                        this.InvokePaintBackground(this, p);
+                        Debug.WriteLine("c1:" + i);
+                        this.InvokePaint(this, p);
+                        Debug.WriteLine("c2:" + i);
+                    }
+                    Debug.WriteLine("d:" + i);
+                }
 
-    
+
+                Debug.WriteLine("e:" + i);
+                //int offsetX = this.Left + (int)Math.Floor((double)(this.Bounds.Width - this.ClientRectangle.Width) / 2.0);
+                //int offsetY = this.Top + (int)Math.Floor((double)(this.Bounds.Height - this.ClientRectangle.Height) / 2.0);
+                //Debug.WriteLine(offsetX + ":" + offsetY);
+
+                pevent.Graphics.DrawImage(
+                    this.bmp,
+                    this.ClientRectangle,
+                    new Rectangle(0, 0, this.ClientRectangle.Width, this.ClientRectangle.Height),
+                    GraphicsUnit.Pixel
+                );
+            }
+            //string filePath = @"C:\tmp\test" + i + ".gif";
+            //this.bmp.Save(filePath, ImageFormat.Gif);
+
+           
+        }
+        /*
+        protected override void OnPaintBackground(PaintEventArgs pevent)
+        {
+            // 何もしない
+            // base.OnPaintBackground(pevent);
+        }
+         */
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            this.TopMost = true;
+
+        }
     }
     
  
